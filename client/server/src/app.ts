@@ -42,6 +42,7 @@ function isPosition(value: unknown): value is [number, number, number] {
 }
 
 function isFurniture(value: unknown): value is Furniture {
+  // Validate the persisted catalogue shape at the API boundary.
   if (typeof value !== "object" || value === null) return false;
 
   const item = value as Record<string, unknown>;
@@ -115,6 +116,7 @@ const PORT = 5000;
 
 async function startServer() {
   try {
+    // Fail startup instead of listening with a missing or incompatible schema.
     await pool.query(`
       CREATE TABLE IF NOT EXISTS room_designs (
         id SERIAL PRIMARY KEY,
@@ -139,6 +141,7 @@ async function startServer() {
   }
 }
 
+// Vitest supplies the app directly, so it must not start the HTTP listener.
 if (process.env.NODE_ENV !== "test") {
   void startServer();
 }

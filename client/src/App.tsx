@@ -13,6 +13,8 @@ type Furniture = {
 type ColorTheme = "sage" | "terracotta" | "ocean";
 
 function App() {
+  // Positions and rotation are kept in the parent so they can be shared with
+  // both the 3D scene and the save/load API payload.
   const [colorTheme, setColorTheme] = useState<ColorTheme>("sage");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -33,6 +35,8 @@ function App() {
   const roomArea = roomWidth * roomLength;
 
   useEffect(() => {
+    // Loading the catalogue once keeps it separate from the user's selection
+    // state and from furniture movement state.
     fetch("http://localhost:5000/api/furniture")
       .then((response) => {
         if (!response.ok) {
@@ -61,6 +65,7 @@ function App() {
   }
 
   async function saveRoomDesign() {
+    // Store both the selected items and their current scene configuration.
     const design = {
       furniture: selectedItems,
       sofaPosition,
@@ -100,6 +105,8 @@ function App() {
 
       const design = await response.json();
 
+      // Stored values fall back to defaults for designs created before a
+      // particular position or rotation field was introduced.
       setSelectedItems(design.furniture);
       setSofaPosition(design.sofaPosition ?? [0, 0, 0]);
       setCoffeeTablePosition(design.coffeeTablePosition ?? [0, 0, 2]);

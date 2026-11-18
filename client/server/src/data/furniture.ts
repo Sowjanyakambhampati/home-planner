@@ -1,4 +1,5 @@
 
+// Shared catalogue seed returned by the API and reused in API tests.
 export const furniture = [
   {
     id: 1,

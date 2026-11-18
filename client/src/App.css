@@ -1,3 +1,4 @@
+/* Shared and theme-specific application colours */
 .app {
   --page-bg: #f5f3ed;
   --accent: #355640;
@@ -38,6 +39,7 @@
   --highlight: #f2c879;
 }
 
+/* Header and color theme selector */
 .header {
   position: relative;
   display: flex;
@@ -175,6 +177,7 @@
   box-shadow: 0 0 0 2px #fff;
 }
 
+/* Catalogue and room panels */
 .container {
   display: grid;
   gap: 26px;
@@ -524,6 +527,7 @@ input:focus-visible {
   font-size: 0.82rem;
 }
 
+/* Footer with selected-item total and design actions */
 .room-footer {
   display: flex;
   align-items: center;

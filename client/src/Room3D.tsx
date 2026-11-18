@@ -19,6 +19,7 @@ type Furniture = {
 
 type ColorTheme = "sage" | "terracotta" | "ocean";
 
+// Shared palette values keep the 3D room coordinated with the selected UI theme.
 const roomPalettes: Record<
   ColorTheme,
   {
@@ -87,7 +88,10 @@ function useGroundDrag(
 ) {
   const [isDragging, setIsDragging] = useState(false);
   const { camera, gl } = useThree();
+  // A horizontal plane lets pointer movement continue over the room floor,
+  // even when the pointer leaves the furniture mesh itself.
   const groundPlane = useRef(new Plane(new Vector3(0, 1, 0), 0));
+  // Preserve the offset from where the user grabbed the object.
   const dragOffset = useRef<[number, number]>([0, 0]);
   const activePointerId = useRef<number | null>(null);
 

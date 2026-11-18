@@ -8,6 +8,7 @@ const savedDesignIds: number[] = [];
 
 afterAll(async () => {
   try {
+    // Keep test API writes out of the persistent room-design history.
     if (savedDesignIds.length > 0) {
       await pool.query(
         "DELETE FROM room_designs WHERE id = ANY($1::integer[])",

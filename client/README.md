@@ -192,7 +192,7 @@ Wait until the terminal reports a successful PostgreSQL connection.
 Open a second terminal in `client`:
 
 ```sh
-npx vite --host 127.0.0.1
+npm run dev
 ```
 
 Open the local URL printed by Vite, normally `http://127.0.0.1:5173`.
