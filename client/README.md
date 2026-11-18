@@ -1,54 +1,53 @@
 # Home Planner
 
-A full-stack room planning application for browsing furniture, arranging items in an interactive 3D room, changing the visual theme, and saving or loading room designs.
+Home Planner is a room-planning project that lets me browse furniture, arrange pieces in a 3D room, and save or reload a design.
 
-Home Planner combines a React interface, an Express REST API, and PostgreSQL. It is designed as a personal project for practicing full-stack development, 3D visualisation, API integration, database persistence, testing, and Docker.
+I built it to practice the parts of a full application that need to work together: React for the interface, Three.js for the room preview, Express for the API, and PostgreSQL for storing designs. Docker keeps the local database setup consistent and makes it easy to start over.
 
 ## Features
 
-- Browse a catalogue of sofas, tables, lamps, and bookshelves.
-- Add furniture to the room or remove it from the selection.
-- View furniture in an interactive Three.js 3D room.
-- Drag the sofa, coffee table, floor lamp, and bookshelf to reposition them.
-- Rotate the sofa by pressing `R` while the application is open.
+- Browse furniture for the room, including a sofa, coffee table, floor lamp, and bookshelf.
+- Add and remove furniture from the selected room.
+- Move furniture around the 3D floor by dragging it.
+- Rotate the sofa by pressing `R`.
 - Enter room width and length values and calculate the room area.
-- Switch between Sage, Terracotta, and Ocean colour themes.
-- Save room selections and furniture positions through a REST API.
-- Load the most recently saved room design from PostgreSQL.
+- Switch between Sage, Terracotta, and Ocean themes.
+- Save the furniture selection and furniture positions to PostgreSQL.
+- Load the most recently saved design.
 
 ## Screenshots
 
-### Furniture Catalogue and Colour Themes
+### Furniture catalogue and colour themes
 
 ![Furniture catalogue with the Terracotta colour theme](./docs/screenshots/catalogue-and-theme.png)
 
-### 3D Room and Furniture Arrangement
+### 3D room and furniture arrangement
 
 ![Interactive 3D room preview with furniture](./docs/screenshots/3d-room-and-selected-furniture.png)
 
-### Selected Furniture and Total
+### Selected furniture and estimated total
 
 ![Furniture selection, removal controls, and estimated total](./docs/screenshots/selected-furniture-and-total.png)
 
-## Technology Stack
+## Technology
 
-| Layer | Technologies |
+| Area | Tools |
 | --- | --- |
 | Frontend | React 19, TypeScript, Vite |
-| 3D visualisation | Three.js, React Three Fiber, Drei |
+| 3D rendering | Three.js, React Three Fiber, Drei |
 | Backend | Node.js, Express 5, TypeScript |
-| Database | PostgreSQL 15, JSONB |
-| Database container | Docker and Docker volumes |
-| Testing | Vitest, Supertest |
-| Package management | npm |
+| Database | PostgreSQL 15 with JSONB |
+| Local database | Docker and Docker volumes |
+| Tests | Vitest and Supertest |
+| Package manager | npm |
 
-## Architecture
+## How the application fits together
 
 ### Frontend
 
-The frontend is in `client/`. React manages the catalogue, selected furniture, room dimensions, positions, rotation, and colour theme. React Three Fiber renders the 3D room and furniture.
+The React frontend is under `client/`. It contains the furniture catalogue, room dimensions, selected-furniture list, colour theme controls, save/load actions, and the 3D scene.
 
-The browser communicates with the API over HTTP:
+The browser calls the backend through:
 
 - `GET /api/furniture`
 - `POST /api/design`
@@ -56,13 +55,13 @@ The browser communicates with the API over HTTP:
 
 ### Backend
 
-The backend is in `client/server/`. Express validates room-design requests, serves the furniture catalogue, and uses `pg` to communicate with PostgreSQL.
+The Express API is under `client/server/`. It validates incoming design data, serves the furniture catalogue, and communicates with PostgreSQL through the `pg` package.
 
-Before listening on port `5000`, the backend creates the `room_designs` table if needed and checks the database connection.
+When the server starts, it checks PostgreSQL and creates the `room_designs` table if it does not exist. It then listens on port `5000`.
 
 ### Database
 
-PostgreSQL stores the latest and historical room-design payloads as JSONB. Each design contains the selected furniture, furniture positions, and sofa rotation.
+PostgreSQL stores room-design JSON in a `room_designs` table. A design includes the selected furniture, sofa and furniture positions, and the sofa's rotation.
 
 ```text
 React frontend
@@ -71,27 +70,27 @@ React frontend
       v
 Express REST API
       |
-      | pg connection pool
+      | PostgreSQL connection pool
       v
-PostgreSQL
+PostgreSQL in Docker
       |
       v
-Docker volume
+Persistent Docker volume
 ```
 
 ## API
 
-| Method | Endpoint | Description |
+| Method | Route | What it does |
 | --- | --- | --- |
-| `GET` | `/api/furniture` | Returns the furniture catalogue. |
-| `POST` | `/api/design` | Validates and saves a room design. |
-| `GET` | `/api/design` | Returns the most recently saved design, or `404` when none exists. |
+| `GET` | `/api/furniture` | Returns the four-item furniture catalogue. |
+| `POST` | `/api/design` | Checks and saves a room design. |
+| `GET` | `/api/design` | Returns the latest saved design, or `404` if no design exists. |
 
-The API runs at `http://localhost:5000`.
+The API is available at `http://localhost:5000`.
 
-## Room-Design Data
+## Saved design format
 
-The API expects a JSON body with the following shape:
+The save request uses this JSON structure:
 
 ```json
 {
@@ -104,33 +103,32 @@ The API expects a JSON body with the following shape:
 }
 ```
 
-- `furniture` is an array of selected furniture objects.
-- Position values are `[x, y, z]` coordinates.
-- `sofaRotation` is measured in radians.
-- A furniture object's `id`, `name`, `category`, `price`, and `emoji` fields are documented in the data model and should be preserved when it is returned by the API.
+- `furniture` contains the selected catalogue items.
+- Each position is an `[x, y, z]` coordinate.
+- `sofaRotation` is stored in radians.
+- Furniture objects include `id`, `name`, `category`, `price`, and `emoji`.
 
-See [POSTGRESQL.md](./server/POSTGRESQL.md) for database setup and environment-variable details.
+The database configuration and table behaviour are covered in [POSTGRESQL.md](./server/POSTGRESQL.md).
 
-## Getting Started
+## Running locally
 
-### Prerequisites
+### What you need
 
+- Git
 - Node.js and npm
 - Docker Desktop
-- Git
+- A PostgreSQL container or another PostgreSQL database
 
-### 1. Clone the Repository
+### 1. Clone the project
 
 ```sh
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-cd <YOUR_PROJECT_DIRECTORY>
+git clone https://github.com/Sowjanyakambhampati/home-planner.git
+cd home-planner
 ```
-
-Replace both placeholders with your repository URL and local project directory name.
 
 ### 2. Start PostgreSQL
 
-PostgreSQL can run in Docker on host port `5433`:
+The project uses host port `5433` for a Docker container running PostgreSQL on port `5432`:
 
 ```sh
 docker run -d \
@@ -144,16 +142,16 @@ docker run -d \
   postgres:15
 ```
 
-Check the container:
+You can check the container with:
 
 ```sh
 docker ps
 docker logs home-planner-postgres
 ```
 
-### 3. Configure the Backend
+### 3. Configure the backend
 
-Create `client/server/.env`:
+Create `client/server/.env` with local database settings:
 
 ```env
 DB_HOST=localhost
@@ -163,21 +161,25 @@ DB_PASSWORD=YOUR_LOCAL_PASSWORD
 DB_NAME=home_planner
 ```
 
-Use the password configured for the Docker PostgreSQL role. Never commit `.env` or database passwords. The file is intended to remain ignored by Git.
+Use the password you set in the Docker command. Keep `.env` private and never commit it or a real database password.
 
-### 4. Install Dependencies
+### 4. Install dependencies
+
+Install the frontend packages:
 
 ```sh
 cd client
 npm install
+```
 
-cd server
+Install the backend packages in another terminal:
+
+```sh
+cd client/server
 npm install
 ```
 
-The commands above assume `client` is the current project directory. If you are already inside `client`, run `cd server` directly.
-
-### 5. Start the Backend
+### 5. Start the backend
 
 From `client/server`:
 
@@ -185,23 +187,21 @@ From `client/server`:
 npm run dev
 ```
 
-Wait until the terminal reports a successful PostgreSQL connection.
+The terminal should confirm that PostgreSQL connected before the API begins listening.
 
-### 6. Start the Frontend
+### 6. Start the frontend
 
-Open a second terminal in `client`:
+In another terminal, from `client`:
 
 ```sh
 npm run dev
 ```
 
-Open the local URL printed by Vite, normally `http://127.0.0.1:5173`.
+Open `http://127.0.0.1:5173`. Both Docker/PostgreSQL and the backend API need to be running for the catalogue and save/load actions to work.
 
-Docker, PostgreSQL, and the backend must be running for the catalogue and save/load features to work.
+## Tests
 
-## Testing
-
-Run the backend API tests from `client/server`:
+Run the API tests from `client/server`:
 
 ```sh
 npm run test:run
@@ -209,19 +209,20 @@ npm run test:run
 
 The tests cover:
 
-- Furniture catalogue retrieval.
-- Saving a room design.
-- Loading the latest design.
-- Re-saving and loading an updated furniture selection.
-- Malformed design validation.
+- Furniture catalogue retrieval
+- Saving a room design
+- Loading the latest design
+- Saving and loading an updated furniture selection
+- Rejecting malformed design or furniture data
 
-The tests use the configured PostgreSQL database and remove rows they create. Run them only against a local or dedicated test database, not production.
+Test-created room designs are deleted after the test run. Use a local or dedicated test database rather than a production database.
 
-## Project Structure
+## Project structure
 
 ```text
-Home-Planner/
+home-planner/
 └── client/
+    ├── docs/screenshots/
     ├── public/
     ├── src/
     │   ├── App.tsx
@@ -243,17 +244,17 @@ Home-Planner/
                 └── furniture.ts
 ```
 
-## Future Improvements
+## Future improvements
 
-- Add accurate room dimensions, custom room layouts, doors, windows, and floor and wall finishes.
-- Improve furniture placement with grid snapping, collision detection, resizing, rotation, and undo/redo.
-- Add a 2D floor plan, realistic furniture models, better camera controls, and room previews.
-- Expand the catalogue with search, filters, categories, variants, dimensions, and availability.
-- Support multiple designs, user accounts, design sharing, shopping lists, and exports.
-- Improve mobile and tablet controls and add frontend, end-to-end, and visual tests.
+- Accurate room dimensions, custom layouts, doors, windows, and wall or floor finishes.
+- Grid snapping, collision detection, furniture resizing and rotation, and undo/redo controls.
+- A 2D floor plan, realistic furniture models, better camera controls, and room previews.
+- Catalogue search, filters, categories, variants, dimensions, and availability.
+- Multiple saved designs, user accounts, design sharing, shopping lists, and exports.
+- Better mobile/tablet controls and frontend, end-to-end, and visual tests.
 
-## Security and Configuration
+## Security
 
-- Do not commit `.env`, credentials, database passwords, or private database URLs.
-- Use a local or dedicated test database for automated tests.
-- Replace example or placeholder passwords with credentials generated for your own environment.
+- Do not commit `.env`, database passwords, credentials, or private database URLs.
+- Use a local or dedicated database for tests.
+- Replace example passwords with credentials created for your own environment.
