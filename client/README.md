@@ -18,13 +18,17 @@ Home Planner combines a React interface, an Express REST API, and PostgreSQL. It
 
 ## Screenshots
 
-Add screenshots before publishing the README publicly:
+### Furniture Catalogue and Colour Themes
 
-<!--
-![Furniture catalogue](./docs/screenshots/catalogue.png)
-![3D room preview](./docs/screenshots/room-preview.png)
-![Selected colour theme](./docs/screenshots/theme.png)
--->
+![Furniture catalogue with the Terracotta colour theme](./docs/screenshots/catalogue-and-theme.png)
+
+### 3D Room and Furniture Arrangement
+
+![Interactive 3D room preview with furniture](./docs/screenshots/3d-room-and-selected-furniture.png)
+
+### Selected Furniture and Total
+
+![Furniture selection, removal controls, and estimated total](./docs/screenshots/selected-furniture-and-total.png)
 
 ## Technology Stack
 
